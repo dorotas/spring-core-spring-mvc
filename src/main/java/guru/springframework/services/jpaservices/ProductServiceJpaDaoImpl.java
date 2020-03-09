@@ -1,7 +1,10 @@
 package guru.springframework.services.jpaservices;
 
+import guru.springframework.commands.ProductForm;
+import guru.springframework.conventers.ProductFormToProduct;
 import guru.springframework.domain.Product;
 import guru.springframework.services.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,9 @@ import java.util.List;
 @Service
 @Profile("jpadao")
 public class ProductServiceJpaDaoImpl extends AbstractJpaDaoService implements ProductService {
+
+    @Autowired
+    private ProductFormToProduct productFormToProduct;
 
     @Override
     public List<Product> listAll() {
@@ -47,5 +53,11 @@ public class ProductServiceJpaDaoImpl extends AbstractJpaDaoService implements P
         em.getTransaction().begin();
         em.remove(em.find(Product.class, id));
         em.getTransaction().commit();
+    }
+
+    @Override
+    public Product saveOrUpdate(ProductForm productForm) {
+        Product newProduct = productFormToProduct.convert(productForm);
+        return saveOrUpdate(newProduct);
     }
 }

@@ -1,5 +1,7 @@
 package guru.springframework.services.jpaservices;
 
+import guru.springframework.commands.CustomerForm;
+import guru.springframework.conventers.CustomerFormToCustomer;
 import guru.springframework.domain.Customer;
 import guru.springframework.services.CustomerService;
 import guru.springframework.services.security.EncryptionService;
@@ -18,6 +20,9 @@ import java.util.List;
 public class CustomerServiceJPADaoImpl extends AbstractJpaDaoService implements CustomerService {
 
     private EncryptionService encryptionService;
+
+    @Autowired
+    private CustomerFormToCustomer customerFormToCustomer;
 
     @Autowired
     public void setEncryptionService(EncryptionService encryptionService) {
@@ -62,5 +67,17 @@ public class CustomerServiceJPADaoImpl extends AbstractJpaDaoService implements 
         em.getTransaction().begin();
         em.remove(em.find(Customer.class, id));
         em.getTransaction().commit();
+    }
+
+    @Override
+    public Customer saveOrUpdateCustomerForm(CustomerForm customerForm) {
+        Customer newCustomer = customerFormToCustomer.convert(customerForm);
+
+        if(newCustomer.getUser().getId() != null){
+            Customer existingCustomer = getById(newCustomer.getId());
+
+            newCustomer.getUser().setEnabled(existingCustomer.getUser().getEnabled());
+        }
+        return saveOrUpdate(newCustomer);
     }
 }

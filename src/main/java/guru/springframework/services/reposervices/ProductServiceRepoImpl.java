@@ -1,5 +1,7 @@
 package guru.springframework.services.reposervices;
 
+import guru.springframework.commands.ProductForm;
+import guru.springframework.conventers.ProductFormToProduct;
 import guru.springframework.domain.Product;
 import guru.springframework.repositories.ProductRepository;
 import guru.springframework.services.ProductService;
@@ -16,6 +18,9 @@ public class ProductServiceRepoImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductFormToProduct productFormToProduct;
 
     @Override
     public List<?> listAll() {
@@ -37,5 +42,11 @@ public class ProductServiceRepoImpl implements ProductService {
     @Override
     public void delete(Integer id) {
         productRepository.delete(id);
+    }
+
+    @Override
+    public Product saveOrUpdate(ProductForm productForm) {
+        Product newProduct = productFormToProduct.convert(productForm);
+        return saveOrUpdate(newProduct);
     }
 }
