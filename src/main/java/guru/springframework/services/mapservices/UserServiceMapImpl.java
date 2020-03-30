@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by jt on 12/14/15.
@@ -33,5 +34,12 @@ public class UserServiceMapImpl extends AbstractMapService implements UserServic
     @Override
     public void delete(Integer id) {
         super.delete(id);
+    }
+
+    @Override
+    public User findByUserName(String userName) {
+
+        Optional<DomainObject> result = domainMap.values().stream().filter(v -> ((User)v).getUsername().equalsIgnoreCase(userName)).findFirst();
+        return (User) result.orElse(null);
     }
 }
